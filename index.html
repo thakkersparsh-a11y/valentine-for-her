@@ -31,7 +31,6 @@ body {
     z-index: 10;
 }
 
-/* Buttons */
 button {
     margin: 12px;
     padding: 12px 24px;
@@ -56,19 +55,6 @@ button {
     100% { transform: rotate(0deg); }
 }
 
-/* Floating background */
-.float {
-    position: absolute;
-    font-size: 24px;
-    animation: float 6s linear infinite;
-    opacity: 0.85;
-}
-
-@keyframes float {
-    from { transform: translateY(100vh); }
-    to { transform: translateY(-10vh); }
-}
-
 /* Fade effects */
 .fade-text {
     animation: fadeIn 1.6s ease forwards;
@@ -89,7 +75,20 @@ button {
     to { opacity: 1; transform: scale(1); }
 }
 
-/* Heart frame */
+/* Floating background */
+.float {
+    position: absolute;
+    font-size: 24px;
+    animation: float 6s linear infinite;
+    opacity: 0.85;
+}
+
+@keyframes float {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-10vh); }
+}
+
+/* Heart frames */
 .pictures {
     display: flex;
     justify-content: center;
@@ -129,7 +128,6 @@ button {
     100% { transform: scale(1); }
 }
 
-/* Timer */
 .timer {
     font-size: 18px;
     margin-top: 10px;
@@ -142,6 +140,7 @@ button {
 
 <audio id="giggle" src="giggle.mp3"></audio>
 <audio id="bgMusic" src="bg-music.mp3" loop></audio>
+<audio id="drumroll" src="drumroll.mp3"></audio>
 
 <div class="popup" id="popup"></div>
 
@@ -149,8 +148,9 @@ button {
 const popup = document.getElementById("popup");
 const giggle = document.getElementById("giggle");
 const bgMusic = document.getElementById("bgMusic");
+const drumroll = document.getElementById("drumroll");
 
-let teasing = true; // controls movement
+let teasing = true;
 
 function show(content) {
     popup.innerHTML = content;
@@ -165,11 +165,27 @@ show(`
 function step2() {
     show(`
     <div class="fade-text">there’s something I really wanna ask you 👀👉👈</div><br>
+    <button onclick="stepDrum()">Next 👉</button>
+    `);
+}
+
+/* 🥁 DRUMROLL PAGE */
+function stepDrum() {
+    drumroll.currentTime = 0;
+    drumroll.play();
+
+    show(`
+    <div class="fade-text" style="font-size:22px;">
+    🥁 Drumroll please… 🥁
+    </div><br>
     <button onclick="step3()">Next 👉</button>
     `);
 }
 
 function step3() {
+    drumroll.pause();
+    drumroll.currentTime = 0;
+
     show(`
     <div class="fade-text">gorgeous, will you be my Valentine 👉👈?</div><br>
     <button id="yesBtn" class="wiggle">YES 💖</button>
@@ -193,7 +209,6 @@ function step3() {
     duhBtn.addEventListener("mouseover", moveDuh);
     duhBtn.addEventListener("touchstart", moveDuh);
 
-    // Stop teasing after 20 seconds
     setTimeout(() => {
         teasing = false;
         yesBtn.classList.remove("wiggle");
