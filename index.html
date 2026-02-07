@@ -28,7 +28,6 @@ body {
     box-shadow: 0 0 25px rgba(255,105,180,0.6);
     width: 90%;
     max-width: 380px;
-    position: relative;
     z-index: 10;
 }
 
@@ -56,14 +55,24 @@ button {
     100% { transform: rotate(0deg); }
 }
 
-/* Fade */
+/* Fade effects */
 .fade-text {
     animation: fadeIn 1.6s ease forwards;
     opacity: 0;
 }
 
+.fade-pics {
+    animation: fadeZoom 1.8s ease forwards;
+    opacity: 0;
+}
+
 @keyframes fadeIn {
     to { opacity: 1; }
+}
+
+@keyframes fadeZoom {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }
 
 /* Floating background */
@@ -142,7 +151,6 @@ const bgMusic = document.getElementById("bgMusic");
 const drumroll = document.getElementById("drumroll");
 
 let teasing = true;
-let jumpInterval = null;
 
 function show(content) {
     popup.innerHTML = content;
@@ -161,12 +169,15 @@ function step2() {
     `);
 }
 
-/* DRUMROLL */
+/* 🥁 DRUMROLL PAGE */
 function stepDrum() {
     drumroll.currentTime = 0;
     drumroll.play();
+
     show(`
-    <div class="fade-text" style="font-size:22px;">🥁 Drumroll please… 🥁</div><br>
+    <div class="fade-text" style="font-size:22px;">
+    🥁 Drumroll please… 🥁
+    </div><br>
     <button onclick="step3()">Next 👉</button>
     `);
 }
@@ -187,25 +198,22 @@ function step3() {
     yesBtn.onclick = yes;
     duhBtn.onclick = duh;
 
-    yesBtn.style.position = duhBtn.style.position = "absolute";
-
-    /* BOTH buttons jump around */
-    jumpInterval = setInterval(() => {
+    function moveDuh() {
         if (!teasing) return;
         giggle.play();
-        yesBtn.style.left = Math.random() * 60 + "vw";
-        yesBtn.style.top  = Math.random() * 60 + "vh";
+        duhBtn.style.position = "absolute";
         duhBtn.style.left = Math.random() * 60 + "vw";
-        duhBtn.style.top  = Math.random() * 60 + "vh";
-    }, 700);
+        duhBtn.style.top = Math.random() * 60 + "vh";
+    }
 
-    /* STOP after 45 seconds */
+    duhBtn.addEventListener("mouseover", moveDuh);
+    duhBtn.addEventListener("touchstart", moveDuh);
+
     setTimeout(() => {
         teasing = false;
-        clearInterval(jumpInterval);
         yesBtn.classList.remove("wiggle");
-        yesBtn.style.position = duhBtn.style.position = "static";
-    }, 45000);
+        duhBtn.style.position = "static";
+    }, 20000);
 }
 
 function yes() {
@@ -225,8 +233,9 @@ function celebrate(text) {
 
 function loveNote() {
     bgMusic.play();
+
     show(`
-    <div class="pictures">
+    <div class="pictures fade-pics">
         <div class="heart-frame"><img src="us1.jpg"></div>
         <div class="heart-frame"><img src="us2.jpg"></div>
     </div>
@@ -235,9 +244,16 @@ function loveNote() {
     Hey gorgeousss 🫶💖💖💖,<br><br>
     HEHEHEHEH my baby girl 🥹🫶<br>
     I LOVES YOU SOOO MUCHHH EHEHE 🥹💖<br><br>
+    Ik this is a short note (it was a sudden plan)<br>
+    I just wanted to say, Thank you 🥹💖<br>
     Thank you for being there for me 🥹💖<br>
     Thank you for everything baby girl 🥹💖<br><br>
-    I am genuinely so grateful to have you in my life 🥹💖🧿<br>
+    I am genuinely so grateful to have you in my life, to have us 🥹💖🧿<br>
+    And I'm grateful we worked things out when it was really hard 💖<br><br>
+    I love you so muchhhh baby girl 💖 and how we talk and care about each other 💖<br>
+    And how we work things out 🫶🫶💖<br><br>
+    I'm really grateful to know that you have my back hehe 💖<br>
+    How we need each other 🥹🫶💖<br><br>
     I love you so much baby girl 💖<br>
     My favourite hooman 😚😚🫶💖
     </div><br>
@@ -278,7 +294,7 @@ function fireworks() {
     })();
 }
 
-/* Floating hearts */
+/* Floating background */
 setInterval(() => {
     const e = document.createElement("div");
     e.className = "float";
