@@ -24,16 +24,16 @@ body {
     padding: 20px;
     border-radius: 20px;
     text-align: center;
-    font-size: 20px;
+    font-size: 18px;
     box-shadow: 0 0 25px rgba(255,105,180,0.6);
-    width: 90%;
-    max-width: 380px;
-    z-index: 10;
+    width: 92%;
+    max-width: 400px;
+    position: relative;
 }
 
 button {
-    margin: 12px;
-    padding: 12px 24px;
+    margin: 10px;
+    padding: 12px 22px;
     font-size: 18px;
     border: none;
     border-radius: 25px;
@@ -42,27 +42,9 @@ button {
     color: white;
 }
 
-/* YES wiggle */
-.wiggle {
-    animation: wiggle 0.6s infinite;
-}
-
-@keyframes wiggle {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(2deg); }
-    50% { transform: rotate(0deg); }
-    75% { transform: rotate(-2deg); }
-    100% { transform: rotate(0deg); }
-}
-
-/* Fade effects */
-.fade-text {
-    animation: fadeIn 1.6s ease forwards;
-    opacity: 0;
-}
-
-.fade-pics {
-    animation: fadeZoom 1.8s ease forwards;
+/* Animations */
+.fade {
+    animation: fadeIn 1.6s forwards;
     opacity: 0;
 }
 
@@ -70,15 +52,22 @@ button {
     to { opacity: 1; }
 }
 
-@keyframes fadeZoom {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+.wiggle {
+    animation: wiggle 0.6s infinite;
 }
 
-/* Floating background */
+@keyframes wiggle {
+    0% { transform: rotate(0); }
+    25% { transform: rotate(2deg); }
+    50% { transform: rotate(0); }
+    75% { transform: rotate(-2deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Hearts background */
 .float {
     position: absolute;
-    font-size: 24px;
+    font-size: 22px;
     animation: float 6s linear infinite;
     opacity: 0.85;
 }
@@ -88,7 +77,7 @@ button {
     to { transform: translateY(-10vh); }
 }
 
-/* Heart frames */
+/* Pictures */
 .pictures {
     display: flex;
     justify-content: center;
@@ -100,13 +89,13 @@ button {
     position: relative;
     width: 100px;
     height: 100px;
-    animation: pulse 2.4s infinite;
+    animation: pulse 2.5s infinite;
 }
 
 .heart-frame::before {
     content: "💖";
-    position: absolute;
     font-size: 110px;
+    position: absolute;
     top: -8px;
     left: -6px;
     filter: drop-shadow(0 0 6px hotpink);
@@ -129,8 +118,8 @@ button {
 }
 
 .timer {
-    font-size: 18px;
     margin-top: 10px;
+    font-size: 17px;
     color: #ff1493;
 }
 </style>
@@ -139,6 +128,7 @@ button {
 <body>
 
 <audio id="giggle" src="giggle.mp3"></audio>
+<audio id="heartbeat" src="heartbeat.mp3"></audio>
 <audio id="bgMusic" src="bg-music.mp3" loop></audio>
 <audio id="drumroll" src="drumroll.mp3"></audio>
 
@@ -147,37 +137,40 @@ button {
 <script>
 const popup = document.getElementById("popup");
 const giggle = document.getElementById("giggle");
+const heartbeat = document.getElementById("heartbeat");
 const bgMusic = document.getElementById("bgMusic");
 const drumroll = document.getElementById("drumroll");
 
+let allowClick = false;
 let teasing = true;
+let jumpInterval;
 
-function show(content) {
-    popup.innerHTML = content;
+bgMusic.volume = 0;
+heartbeat.volume = 1;
+
+function show(html) {
+    popup.innerHTML = html;
 }
 
 /* STEP 1 */
 show(`
-<div class="fade-text">hey gorgeousss 🫶💖</div><br>
+<div class="fade">hey gorgeousss 🫶💖</div><br>
 <button onclick="step2()">Next 👉</button>
 `);
 
 function step2() {
     show(`
-    <div class="fade-text">there’s something I really wanna ask you 👀👉👈</div><br>
+    <div class="fade">there’s something I really wanna ask you 👀👉👈</div><br>
     <button onclick="stepDrum()">Next 👉</button>
     `);
 }
 
-/* 🥁 DRUMROLL PAGE */
+/* DRUMROLL PAGE */
 function stepDrum() {
     drumroll.currentTime = 0;
     drumroll.play();
-
     show(`
-    <div class="fade-text" style="font-size:22px;">
-    🥁 Drumroll please… 🥁
-    </div><br>
+    <div class="fade" style="font-size:22px;">🥁 Drumroll please… 🥁</div><br>
     <button onclick="step3()">Next 👉</button>
     `);
 }
@@ -186,8 +179,11 @@ function step3() {
     drumroll.pause();
     drumroll.currentTime = 0;
 
+    allowClick = false;
+    teasing = true;
+
     show(`
-    <div class="fade-text">gorgeous, will you be my Valentine 👉👈?</div><br>
+    <div class="fade">gorgeous, will you be my Valentine 👉👈?</div><br>
     <button id="yesBtn" class="wiggle">YES 💖</button>
     <button id="duhBtn">DUHHHH 😤</button>
     `);
@@ -195,67 +191,83 @@ function step3() {
     const yesBtn = document.getElementById("yesBtn");
     const duhBtn = document.getElementById("duhBtn");
 
-    yesBtn.onclick = yes;
-    duhBtn.onclick = duh;
+    yesBtn.style.position = duhBtn.style.position = "absolute";
 
-    function moveDuh() {
+    yesBtn.onclick = () => {
+        if (!allowClick) return;
+        celebrate("YAYAYAYAYYYY 🎉💖");
+    };
+
+    duhBtn.onclick = () => {
+        if (!allowClick) return;
+        celebrate("HEHEHEHEHEEE YYYAYAYAYYYYY HAPPY DANCE HEHEHEE 💃💖");
+    };
+
+    jumpInterval = setInterval(() => {
         if (!teasing) return;
-        giggle.play();
-        duhBtn.style.position = "absolute";
-        duhBtn.style.left = Math.random() * 60 + "vw";
-        duhBtn.style.top = Math.random() * 60 + "vh";
-    }
 
-    duhBtn.addEventListener("mouseover", moveDuh);
-    duhBtn.addEventListener("touchstart", moveDuh);
+        heartbeat.currentTime = 0;
+        heartbeat.play();
+        giggle.play();
+
+        yesBtn.style.left = Math.random() * 60 + "vw";
+        yesBtn.style.top  = Math.random() * 60 + "vh";
+        duhBtn.style.left = Math.random() * 60 + "vw";
+        duhBtn.style.top  = Math.random() * 60 + "vh";
+    }, 700);
 
     setTimeout(() => {
         teasing = false;
+        allowClick = true;
+        clearInterval(jumpInterval);
         yesBtn.classList.remove("wiggle");
-        duhBtn.style.position = "static";
-    }, 20000);
+        yesBtn.style.position = duhBtn.style.position = "static";
+        crossfade();
+    }, 45000);
 }
 
-function yes() {
-    celebrate("YAYAYAYAYYYY 🎉💖");
-}
-
-function duh() {
-    celebrate("HEHEHEHEHEEE YYYAYAYAYYYYY HAPPY DANCE HEHEHEE 💃💖");
+/* CROSSFADE */
+function crossfade() {
+    bgMusic.play();
+    let fade = setInterval(() => {
+        heartbeat.volume -= 0.05;
+        bgMusic.volume += 0.05;
+        if (heartbeat.volume <= 0) {
+            heartbeat.pause();
+            clearInterval(fade);
+        }
+    }, 200);
 }
 
 function celebrate(text) {
-    show(`<div class="fade-text">${text}</div>`);
-    confettiBoom();
-    fireworks();
-    setTimeout(loveNote, 1800);
+    show(`<div class="fade">${text}</div>`);
+    confetti({ particleCount: 200, spread: 80 });
+    setTimeout(showNote, 1800);
 }
 
-function loveNote() {
-    bgMusic.play();
-
+function showNote() {
     show(`
-    <div class="pictures fade-pics">
+    <div class="pictures fade">
         <div class="heart-frame"><img src="us1.jpg"></div>
         <div class="heart-frame"><img src="us2.jpg"></div>
     </div>
 
-    <div class="fade-text" style="font-size:15px; text-align:left;">
+    <div class="fade" style="font-size:15px; text-align:left;">
     Hey gorgeousss 🫶💖💖💖,<br><br>
-    HEHEHEHEH my baby girl 🥹🫶<br>
-    I LOVES YOU SOOO MUCHHH EHEHE 🥹💖<br><br>
-    Ik this is a short note (it was a sudden plan)<br>
-    I just wanted to say, Thank you 🥹💖<br>
-    Thank you for being there for me 🥹💖<br>
-    Thank you for everything baby girl 🥹💖<br><br>
-    I am genuinely so grateful to have you in my life, to have us 🥹💖🧿<br>
-    And I'm grateful we worked things out when it was really hard 💖<br><br>
-    I love you so muchhhh baby girl 💖 and how we talk and care about each other 💖<br>
-    And how we work things out 🫶🫶💖<br><br>
-    I'm really grateful to know that you have my back hehe 💖<br>
-    How we need each other 🥹🫶💖<br><br>
-    I love you so much baby girl 💖<br>
-    My favourite hooman 😚😚🫶💖
+    HEHEHEHEH my baby girl🥹🫶<br>
+    I LOVES YOU SOOO MUCHHH EHEHE🥹💖<br><br>
+    Ik this is a short note(It was a sudden plan)<br>
+    I just wanted to say, Thank you🥹💖<br>
+    Thank you for being there for me🥹💖<br>
+    Thank you for everything baby girl🥹💖<br><br>
+    I am genuinely so grateful to have you in my life, to have us🥹💖🧿<br>
+    And I'm grateful we worked things out when it was really hard💖<br><br>
+    I love you so muchhhh baby girl💖 and how we talk and care about each other 💖<br>
+    And how we work things out🫶🫶💖<br><br>
+    I'm really grateful to know that you have my back hehe💖<br>
+    How we need each other🥹🫶💖<br><br>
+    I love you so much baby girl💖<br>
+    My favourite hooman😚😚🫶💖
     </div><br>
 
     🌹 Happy Rose Day my love 🌹<br><br>
@@ -265,8 +277,8 @@ function loveNote() {
 
 function showCountdown() {
     show(`
-    <div class="fade-text">💕 Countdown until Valentine’s Day 💕</div>
-    <div class="timer fade-text" id="timer"></div>
+    <div class="fade">💕 Countdown until Valentine’s Day 💕</div>
+    <div class="timer fade" id="timer"></div>
     `);
 
     const valentine = new Date("February 14, 2026 00:00:00").getTime();
@@ -281,20 +293,7 @@ function showCountdown() {
     }, 1000);
 }
 
-function confettiBoom() {
-    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }});
-}
-
-function fireworks() {
-    let end = Date.now() + 2000;
-    (function frame() {
-        confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }});
-        confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }});
-        if (Date.now() < end) requestAnimationFrame(frame);
-    })();
-}
-
-/* Floating background */
+/* Floating hearts */
 setInterval(() => {
     const e = document.createElement("div");
     e.className = "float";
