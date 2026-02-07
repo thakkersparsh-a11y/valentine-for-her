@@ -132,7 +132,6 @@ button {
 <audio id="giggle" src="giggle.mp3"></audio>
 <audio id="bgMusic" src="bg-music.mp3" loop></audio>
 <audio id="drumroll" src="drumroll.mp3"></audio>
-<audio id="heartbeat" src="heartbeat.mp3"></audio>
 
 <div class="popup" id="popup"></div>
 
@@ -141,13 +140,9 @@ const popup = document.getElementById("popup");
 const giggle = document.getElementById("giggle");
 const bgMusic = document.getElementById("bgMusic");
 const drumroll = document.getElementById("drumroll");
-const heartbeat = document.getElementById("heartbeat");
 
 let teasing = true;
 let jumpInterval = null;
-
-bgMusic.volume = 0;
-heartbeat.volume = 1;
 
 function show(content) {
     popup.innerHTML = content;
@@ -194,40 +189,23 @@ function step3() {
 
     yesBtn.style.position = duhBtn.style.position = "absolute";
 
+    /* BOTH buttons jump around */
     jumpInterval = setInterval(() => {
         if (!teasing) return;
-
-        heartbeat.currentTime = 0;
-        heartbeat.play();
         giggle.play();
-
         yesBtn.style.left = Math.random() * 60 + "vw";
         yesBtn.style.top  = Math.random() * 60 + "vh";
         duhBtn.style.left = Math.random() * 60 + "vw";
         duhBtn.style.top  = Math.random() * 60 + "vh";
     }, 700);
 
-    /* STOP after 45 seconds + CROSSFADE */
+    /* STOP after 45 seconds */
     setTimeout(() => {
         teasing = false;
         clearInterval(jumpInterval);
         yesBtn.classList.remove("wiggle");
         yesBtn.style.position = duhBtn.style.position = "static";
-        crossfadeHeartbeatToMusic();
     }, 45000);
-}
-
-function crossfadeHeartbeatToMusic() {
-    bgMusic.play();
-    let fade = setInterval(() => {
-        if (heartbeat.volume > 0) heartbeat.volume -= 0.05;
-        if (bgMusic.volume < 1) bgMusic.volume += 0.05;
-
-        if (heartbeat.volume <= 0 && bgMusic.volume >= 1) {
-            heartbeat.pause();
-            clearInterval(fade);
-        }
-    }, 200);
 }
 
 function yes() {
@@ -246,6 +224,7 @@ function celebrate(text) {
 }
 
 function loveNote() {
+    bgMusic.play();
     show(`
     <div class="pictures">
         <div class="heart-frame"><img src="us1.jpg"></div>
@@ -254,6 +233,11 @@ function loveNote() {
 
     <div class="fade-text" style="font-size:15px; text-align:left;">
     Hey gorgeousss 🫶💖💖💖,<br><br>
+    HEHEHEHEH my baby girl 🥹🫶<br>
+    I LOVES YOU SOOO MUCHHH EHEHE 🥹💖<br><br>
+    Thank you for being there for me 🥹💖<br>
+    Thank you for everything baby girl 🥹💖<br><br>
+    I am genuinely so grateful to have you in my life 🥹💖🧿<br>
     I love you so much baby girl 💖<br>
     My favourite hooman 😚😚🫶💖
     </div><br>
