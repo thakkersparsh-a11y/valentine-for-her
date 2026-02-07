@@ -1,1 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Valentine 💖</title>
 
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: 'Comic Sans MS', cursive;
+    background: linear-gradient(135deg, #ffb6c1, #ffd1dc);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup {
+    background: #fff0f5;
+    padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 20px;
+    box-shadow: 0 0 25px rgba(255,105,180,0.6);
+    width: 90%;
+    max-width: 380px;
+    z-index: 10;
+}
+
+/* Buttons */
+button {
+    margin: 12px;
+    padding: 12px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    background: hotpink;
+    color: white;
+}
+
+/* YES wiggle */
+.wiggle {
+    animation: wiggle 0.6s infinite;
+}
+
+@keyframes wiggle {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(2deg); }
+    50% { transform: rotate(0deg); }
+    75% { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Floating background */
+.float {
+    position: absolute;
+    font-size: 24px;
+    animation: float 6s linear infinite;
+    opacity: 0.85;
+}
+
+@keyframes float {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-10vh); }
+}
+
+/* Fade effects */
+.fade-text {
+    animation: fadeIn 1.6s ease forwards;
+    opacity: 0;
+}
+
+.fade-pics {
+    animation: fadeZoom 1.8s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to { opacity: 1; }
+}
+
+@keyframes fadeZoom {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* Heart frame */
+.pictures {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.heart-frame {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    animation: pulse 2.4s infinite;
+}
+
+.heart-frame::before {
+    content: "💖";
+    position: absolute;
+    font-size: 110px;
+    top: -8px;
+    left: -6px;
+    filter: drop-shadow(0 0 6px hotpink);
+}
+
+.heart-frame img {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+    object-fit: cover;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+}
+
+/* Timer */
+.timer {
+    font-size: 18px;
+    margin-top: 10px;
+    color: #ff1493;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="giggle" src="giggle.mp3"></audio>
+<audio id="bgMusic" src="bg-music.mp3" loop></audio>
+
+<div class="popup" id="popup"></div>
+
+<script>
+const popup = document.getElementById("popup");
+const giggle = document.getElementById("giggle");
+const bgMusic = document.getElementById("bgMusic");
+
+let teasing = true; // controls movement
+
+function show(content) {
+    popup.innerHTML = content;
+}
+
+/* STEP 1 */
+show(`
+<div class="fade-text">hey gorgeousss 🫶💖</div><br>
+<button onclick="step2()">Next 👉</button>
+`);
+
+function step2() {
+    show(`
+    <div class="fade-text">there’s something I really wanna ask you 👀👉👈</div><br>
+    <button onclick="step3()">Next 👉</button>
+    `);
+}
+
+function step3() {
+    show(`
+    <div class="fade-text">gorgeous, will you be my Valentine 👉👈?</div><br>
+    <button id="yesBtn" class="wiggle">YES 💖</button>
+    <button id="duhBtn">DUHHHH 😤</button>
+    `);
+
+    const yesBtn = document.getElementById("yesBtn");
+    const duhBtn = document.getElementById("duhBtn");
+
+    yesBtn.onclick = yes;
+    duhBtn.onclick = duh;
+
+    function moveDuh() {
+        if (!teasing) return;
+        giggle.play();
+        duhBtn.style.position = "absolute";
+        duhBtn.style.left = Math.random() * 60 + "vw";
+        duhBtn.style.top = Math.random() * 60 + "vh";
+    }
+
+    duhBtn.addEventListener("mouseover", moveDuh);
+    duhBtn.addEventListener("touchstart", moveDuh);
+
+    // Stop teasing after 20 seconds
+    setTimeout(() => {
+        teasing = false;
+        yesBtn.classList.remove("wiggle");
+        duhBtn.style.position = "static";
+    }, 20000);
+}
+
+function yes() {
+    celebrate("YAYAYAYAYYYY 🎉💖");
+}
+
+function duh() {
+    celebrate("HEHEHEHEHEEE YYYAYAYAYYYYY HAPPY DANCE HEHEHEE 💃💖");
+}
+
+function celebrate(text) {
+    show(`<div class="fade-text">${text}</div>`);
+    confettiBoom();
+    fireworks();
+    setTimeout(loveNote, 1800);
+}
+
+function loveNote() {
+    bgMusic.play();
+
+    show(`
+    <div class="pictures fade-pics">
+        <div class="heart-frame"><img src="us1.jpg"></div>
+        <div class="heart-frame"><img src="us2.jpg"></div>
+    </div>
+
+    <div class="fade-text" style="font-size:15px; text-align:left;">
+    Hey gorgeousss 🫶💖💖💖,<br><br>
+    HEHEHEHEH my baby girl 🥹🫶<br>
+    I LOVES YOU SOOO MUCHHH EHEHE 🥹💖<br><br>
+    Ik this is a short note (it was a sudden plan)<br>
+    I just wanted to say, Thank you 🥹💖<br>
+    Thank you for being there for me 🥹💖<br>
+    Thank you for everything baby girl 🥹💖<br><br>
+    I am genuinely so grateful to have you in my life, to have us 🥹💖🧿<br>
+    And I'm grateful we worked things out when it was really hard 💖<br><br>
+    I love you so muchhhh baby girl 💖 and how we talk and care about each other 💖<br>
+    And how we work things out 🫶🫶💖<br><br>
+    I'm really grateful to know that you have my back hehe 💖<br>
+    How we need each other 🥹🫶💖<br><br>
+    I love you so much baby girl 💖<br>
+    My favourite hooman 😚😚🫶💖
+    </div><br>
+
+    🌹 Happy Rose Day my love 🌹<br><br>
+    <button onclick="showCountdown()">Next 👉</button>
+    `);
+}
+
+function showCountdown() {
+    show(`
+    <div class="fade-text">💕 Countdown until Valentine’s Day 💕</div>
+    <div class="timer fade-text" id="timer"></div>
+    `);
+
+    const valentine = new Date("February 14, 2026 00:00:00").getTime();
+    setInterval(() => {
+        const now = new Date().getTime();
+        const d = valentine - now;
+        document.getElementById("timer").innerHTML =
+        Math.floor(d / 86400000) + " Days 💖 " +
+        Math.floor(d / 3600000 % 24) + " Hours 💕 " +
+        Math.floor(d / 60000 % 60) + " Minutes 💓 " +
+        Math.floor(d / 1000 % 60) + " Seconds";
+    }, 1000);
+}
+
+function confettiBoom() {
+    confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }});
+}
+
+function fireworks() {
+    let end = Date.now() + 2000;
+    (function frame() {
+        confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }});
+        confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }});
+        if (Date.now() < end) requestAnimationFrame(frame);
+    })();
+}
+
+/* Floating background */
+setInterval(() => {
+    const e = document.createElement("div");
+    e.className = "float";
+    e.innerText = Math.random() > 0.5 ? "💖" : "🌸";
+    e.style.left = Math.random() * 100 + "vw";
+    document.body.appendChild(e);
+    setTimeout(() => e.remove(), 7000);
+}, 700);
+</script>
+
+</body>
+</html>
